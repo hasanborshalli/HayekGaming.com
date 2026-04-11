@@ -1,0 +1,532 @@
+:root {
+    --silver-gradient: linear-gradient(
+        166deg,
+        rgba(150, 150, 150, 1) 0%,
+        rgba(224, 222, 222, 1) 100%
+    );
+    --gold-gradient: linear-gradient(541deg, #e4b440 0%, #cfa031 100%);
+}
+.boxes-container {
+    padding: 20px;
+}
+
+.boxes {
+    width: 100%; /* or use 100% if inside a full-width parent */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.box {
+    width: 48%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+.box a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.box img {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+    object-fit: cover;
+    object-position: center;
+}
+.box-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: white;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0)
+    ); /* fading shadow */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start; /* text stays at the top */
+    padding: 10px;
+    box-sizing: border-box;
+}
+.box-title h3 {
+    margin: 0;
+    transition: transform 0.5s ease;
+}
+.box:hover img {
+    transform: scale(1.1); /* slight zoom */
+}
+.box:hover .box-title {
+    opacity: 1;
+}
+.box:hover .box-title h3 {
+    transform: translateY(5px);
+}
+.new,
+.featured {
+    background-image: url("/img/background1.webp");
+    height: 500px;
+    margin: 20px;
+    padding-top: 10px;
+    position: relative;
+    z-index: 9;
+}
+.featured {
+    background-image: url("/img/background2.webp");
+}
+.section-title {
+    font-weight: 600;
+    color: white;
+    text-align: center;
+}
+
+.shadow {
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 0, 0)
+    );
+}
+.ps5-controllers {
+    padding: 2rem 1.5rem; /* Top/Bottom 2rem, Left/Right 1.5rem */
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #ddd;
+    width: 80%;
+    margin: auto;
+    box-sizing: border-box;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+.view-all {
+    background: #db0000;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.view-all:hover {
+    background: #c60000;
+}
+.controller-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem 1rem 1rem 1rem; /* Add horizontal padding */
+    scroll-padding-left: 1rem; /* Helps scroll snapping align properly */
+}
+.controller-carousel::-webkit-scrollbar {
+    height: 8px;
+}
+.controller-carousel::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+.controller-card {
+    height: 300px;
+    position: relative;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 0 0 200px;
+    padding: 1rem;
+    text-align: center;
+}
+.controller-card h3 {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+.controller-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+}
+
+.controller-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sale-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff4d4d;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.product-price {
+    font-size: 14px;
+    margin-bottom: 0.5rem;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 6px;
+}
+
+.sale-price {
+    color: red;
+    font-weight: bold;
+}
+
+.cart-icon {
+    width: 20px;
+    margin-left: 5px;
+}
+
+.controller-card .price {
+    color: #db0000;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.controller-card button {
+    position: absolute;
+    bottom: 10px;
+    left: 55px;
+    background-color: #d8bfff;
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+.controller-card button:hover {
+    background: var(--main-color);
+    color: white;
+}
+.controller-card button:hover .cart-icon {
+    content: url("/img/cart.svg");
+}
+
+.info {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.general-info ul {
+    list-style-type: none;
+}
+.general-info ul li {
+    margin-top: 10px;
+}
+.map {
+    margin: 0 50px 50px 0;
+    width: 650px;
+}
+.map iframe {
+    width: 100%;
+}
+.open {
+    background-color: #00ff4d4d;
+    padding: 5px;
+    border-radius: 8px;
+    color: gray;
+}
+.closed {
+    background-color: #ff00004d; /* reddish */
+    padding: 5px;
+    border-radius: 8px;
+    color: gray;
+}
+/* Watch Carousel Container */
+.watches-section {
+    padding: 2rem 1.5rem;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #ddd;
+    width: 80%;
+    margin: 40px auto;
+    box-sizing: border-box;
+}
+
+/* Header */
+.watches-section .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+.watches-section .view-all {
+    background: var(--gold-gradient);
+    color: black;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.watches-section .view-all:hover {
+    opacity: 0.9;
+}
+
+/* Carousel */
+.watch-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem;
+    scroll-padding-left: 1rem;
+}
+.watch-carousel::-webkit-scrollbar {
+    height: 8px;
+}
+.watch-carousel::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+/* Cards */
+.watch-card {
+    height: 300px;
+    position: relative;
+    background: none;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-image: linear-gradient(white, white), var(--silver-gradient);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    flex: 0 0 200px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+.watch-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Image Wrapper */
+.watch-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+}
+.watch-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* SALE Badge */
+.watch-card .sale-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--gold-gradient);
+    color: black;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+/* Prices */
+.watch-card .product-price {
+    font-size: 14px;
+    margin-bottom: 0.5rem;
+}
+.watch-card .old-price {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 6px;
+}
+.watch-card .sale-price {
+    color: #cfa031;
+    font-weight: bold;
+}
+.watch-card .price {
+    color: #cfa031;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+/* Add to cart */
+.watch-card button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--silver-gradient);
+    color: black;
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    width: 80%; /* ✅ consistent width */
+    max-width: 180px; /* ✅ prevent oversized buttons */
+    box-sizing: border-box;
+}
+.watch-card button:hover {
+    background: var(--gold-gradient);
+    color: black;
+}
+.watch-card button:hover .cart-icon {
+    content: url("/img/black-cart.svg");
+}
+.watch-card .cart-icon {
+    width: 18px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .watches-section {
+        width: 95%;
+        padding: 1.5rem;
+    }
+    .watch-card {
+        flex: 0 0 180px;
+        padding: 0.8rem;
+    }
+    .watch-card h3 {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .ps5-controllers {
+        width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .ps5-controllers {
+        padding: 1.5rem;
+        width: 95%;
+    }
+
+    .controller-card {
+        flex: 0 0 180px;
+        padding: 0.8rem;
+    }
+
+    .controller-img {
+        height: 100px;
+    }
+
+    .controller-card h3 {
+        font-size: 0.95rem;
+    }
+
+    .controller-card .price {
+        font-size: 0.95rem;
+    }
+
+    .controller-card button {
+        left: 40px;
+        font-size: 0.9rem;
+        padding: 0.4rem;
+    }
+
+    .view-all {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+    .box {
+        width: 100%;
+        margin: auto;
+        height: 300px;
+    }
+    .controllers {
+        flex-direction: column;
+        gap: 50px;
+    }
+    .controller-card {
+        width: 80%;
+    }
+    .controllers::before {
+        background-image: url("/img/background3-vertical.webp");
+        background-size: contain;
+        background-position: top center;
+    }
+    .info {
+        flex-direction: column;
+    }
+    .map {
+        width: 100%;
+        margin: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .controller-carousel {
+        gap: 0.5rem;
+        scroll-snap-type: x mandatory;
+    }
+
+    .controller-card {
+        flex: 0 0 160px;
+        scroll-snap-align: start;
+    }
+
+    .header h2 {
+        font-size: 1.25rem;
+    }
+
+    .view-all {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
+    }
+    .section-title h1 {
+        font-size: 15px;
+    }
+    .new,
+    .featured {
+        height: 400px;
+    }
+    .watch-card {
+        flex: 0 0 160px;
+    }
+    .watch-card button {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    .box {
+        height: 200px;
+    }
+
+    .controller-card {
+        height: 300px;
+        width: 90%;
+    }
+}

@@ -1,0 +1,115 @@
+@font-face {
+    font-family: "Facon";
+    src: url("/fonts/Facon.ttf") format("truetype");
+}
+footer {
+    padding-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    background-color: var(--main-color);
+}
+.left-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+}
+.social-media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+footer h3 {
+    color: white;
+}
+footer ul {
+    list-style-type: none;
+    padding: 0;
+}
+footer a {
+    text-decoration: none;
+    color: white;
+}
+footer ul li {
+    margin: 20px 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+footer ul img {
+    width: 20px;
+}
+.small-text {
+    margin: 0;
+    font-family: "Archivo Black";
+    font-size: 1.3rem;
+    color: white;
+}
+.medium-text {
+    font-family: "Archivo Black";
+    color: black;
+    font-size: 1.8rem;
+}
+.large-text {
+    font-family: "Archivo Black";
+    color: #ff914d;
+    font-size: 2.5rem;
+}
+.page-name {
+    display: none;
+}
+.marquee-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+marquee {
+    width: 90%;
+    margin: 20px auto;
+    color: var(--main-color);
+    font-weight: 900;
+    font-family: "Facon", sans-serif;
+    letter-spacing: 10px;
+    font-size: 18px;
+}
+@media (max-width: 768px) {
+    footer {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+        width: auto;
+    }
+    .small-text {
+        font-size: 1rem;
+    }
+    .medium-text {
+        font-size: 1.5rem;
+    }
+    .large-text {
+        font-size: 2.2rem;
+    }
+    .social-media {
+        flex-direction: column;
+    }
+    .page-name {
+        display: block;
+    }
+    .social-media a {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 20px;
+    }
+}
+@media (max-width: 480px) {
+    marquee {
+        width: 100%;
+        font-size: 14px;
+    }
+}

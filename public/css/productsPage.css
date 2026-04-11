@@ -1,0 +1,239 @@
+body {
+    background-color: rgb(249 250 251);
+}
+.productsPage {
+    padding: 20px;
+}
+.path {
+    margin: 30px;
+    color: rgba(235, 27, 27);
+}
+.path a {
+    text-decoration: none;
+    color: rgba(235, 27, 27);
+    width: fit-content;
+}
+.productsList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+.gameType-filter-form {
+    margin: 20px auto;
+    width: 90%;
+    font-family: "Poppins", sans-serif;
+}
+.gameTypes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.gameType-filter-form h4 {
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: #333;
+}
+
+.gameType-filter-form label {
+    display: inline-block;
+    margin: 6px 12px 6px 0;
+    font-size: 15px;
+    color: #444;
+    cursor: pointer;
+    user-select: none;
+}
+
+.gameType-filter-form input[type="checkbox"] {
+    margin-right: 6px;
+    accent-color: var(--main-color); /* modern checkbox color */
+    transform: scale(1.1);
+}
+
+.gameType-filter-form button {
+    margin-top: 14px;
+    padding: 8px 20px;
+    font-size: 15px;
+    background-color: var(--main-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.gameType-filter-form button:hover {
+    background-color: #0056b3;
+}
+/* Floating Button */
+.filter-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--main-color);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+.filter-toggle-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Popup Form Container (initially hidden) */
+.filter-form-popup {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 90%;
+    max-width: 360px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    padding: 16px;
+}
+
+/* Optional slide in effect */
+.filter-form-popup.show {
+    display: block;
+    animation: slide-up 0.3s ease;
+}
+.close-filter-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s ease;
+    z-index: 1001;
+}
+
+.close-filter-btn:hover {
+    color: #333;
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+.product-card,
+.product-category,
+.product-title p {
+    color: black !important;
+}
+.product-card {
+    border: 2px solid #d8bfff;
+    border-radius: 18px;
+    position: relative;
+    overflow: visible;
+    padding: 5px;
+    margin-bottom: 20px;
+}
+
+.sold-out-btn {
+    width: 140px;
+    left: 45px !important;
+}
+.add-to-cart-btn {
+    position: absolute;
+    bottom: -15px;
+    left: 55px;
+}
+.products {
+    padding: 20px 20px;
+}
+.sales {
+    border-color: #ff4d4d;
+}
+.notAvailable {
+    border-color: grey !important;
+}
+.sales-add-to-cart-btn {
+    color: white;
+    background-color: #ff4d4d;
+    width: 140px;
+    left: 45px;
+}
+@media (max-width: 768px) {
+    .add-to-cart-btn {
+        left: 35px;
+    }
+    .sales-add-to-cart-btn {
+        left: 27px;
+    }
+    .sold-out-btn {
+        left: 27px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .add-to-cart-btn {
+        bottom: -13px;
+        left: 30px;
+        width: auto;
+    }
+    .sold-out-btn {
+        left: 30px !important;
+        width: 100px !important;
+    }
+    .productsList,
+    .productsPage {
+        padding: 5px;
+    }
+
+    .card-image {
+        min-height: 200px;
+    }
+
+    .product-card {
+        width: 150px;
+    }
+
+    .product-price,
+    .old-price,
+    .sale-price {
+        font-size: 12px;
+    }
+
+    .old-price {
+        margin: 0;
+    }
+
+    .product-price {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-category-price {
+        height: 36px;
+    }
+}
+@media (max-width: 430px) {
+    .path {
+        font-size: 14px;
+    }
+}

@@ -1,0 +1,366 @@
+:root {
+    --main-color: #2a2670;
+    --main-text: "Montserrat";
+}
+
+body {
+    margin: 0;
+    font-family: var(--main-text);
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: var(--main-color);
+    color: white;
+    flex-wrap: wrap;
+}
+
+.navbar-left,
+.navbar-center,
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+.cart-wrapper {
+    position: relative;
+    display: inline-block;
+    height: 40px;
+}
+
+.cart-quantity {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--main-color);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 0.3px 0.3px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    box-shadow: 0 0 0 2px white;
+}
+.mobile,
+.search-container {
+    display: none;
+}
+.search-container {
+    margin: 15px;
+    position: relative;
+}
+
+.search-container form {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid var(--main-color);
+    border-radius: 20px;
+    padding-right: 40px; /* space for the search button */
+    box-sizing: border-box;
+}
+
+.search-btn {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background-color: #2a2670;
+    border: none;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+}
+
+.search-btn .search-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1); /* ensure white icon on dark bg */
+}
+.categories-container {
+    width: 100%;
+}
+.categories {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    list-style-type: none;
+}
+.categories li {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.categories li:hover,
+.categories li a:hover {
+    color: var(--main-color) !important;
+}
+.navbar-left .logo {
+    width: 130px; /* Adjust this as needed */
+    height: 50px;
+}
+.navbar-center .logo-mobile {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.navbar-center {
+    flex: 1;
+    justify-content: center;
+}
+
+.navbar-center form,
+.navbar-center input {
+    width: 100%;
+    max-width: 600px;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 25px;
+}
+
+.burger {
+    display: none;
+    font-size: 1.5rem;
+    color: white;
+    margin-right: 1rem;
+    cursor: pointer;
+}
+
+.logo-mobile {
+    display: none;
+}
+.logo-mobile img {
+    width: 90px;
+}
+.icon {
+    width: 24px;
+    height: 24px;
+    padding: 0.5rem;
+    margin-left: 0.7rem;
+    cursor: pointer;
+    background-color: transparent;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+    font-family: sans-serif;
+    cursor: pointer;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 10px;
+    margin: 0;
+    list-style: none;
+    background-color: white;
+    z-index: 9;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.dropdown-menu li {
+    padding: 5px 0;
+    color: #000;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown:hover .arrow {
+    transform: rotate(180deg);
+}
+
+.categories a {
+    color: black;
+    text-decoration: none;
+}
+
+#mobile-search-results {
+    width: 100%;
+}
+#search-results {
+    width: 50%;
+}
+#search-results,
+#mobile-search-results {
+    display: none;
+
+    position: absolute;
+    background-color: white;
+    border: 1px solid var(--main-color);
+    border-radius: 10px;
+    margin-top: 5px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 999;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: var(--main-text);
+    color: black; /* ⬅ fix white text */
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+    color: black;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.result-item:hover {
+    background-color: var(--main-color);
+    color: white;
+}
+
+.result-img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.result-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.product-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.product-price-search,
+.product-sale {
+    font-size: 0.85rem;
+    color: red;
+    font-weight: bold;
+}
+
+.product-regular {
+    font-size: 0.8rem;
+    color: #999;
+    margin-left: 6px;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+}
+
+.sale-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.sale-badge-search {
+    background-color: red;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    animation: pulse 0.8s infinite;
+}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.85;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .web,
+    .categories-container {
+        display: none;
+    }
+    .mobile,
+    .search-container {
+        display: flex;
+    }
+    .navbar {
+        background-color: white;
+    }
+
+    .navbar-left .logo {
+        display: none;
+    }
+
+    .navbar-center input {
+        display: none;
+    }
+    .search-input {
+        max-width: 100%;
+    }
+
+    .search-btn {
+        padding: 0.3rem;
+    }
+    .burger {
+        display: block;
+    }
+
+    .logo-mobile {
+        display: block;
+    }
+    .navbar-center {
+        flex: 0;
+    }
+    .navbar-right i {
+        background-color: white;
+        color: var(--main-color);
+        border-color: var(--main-color);
+    }
+    #search-results {
+        display: none !important;
+    }
+}

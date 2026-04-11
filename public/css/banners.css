@@ -1,0 +1,161 @@
+.banners-page {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    color: #333;
+}
+
+.page-title {
+    color: #2a2670;
+    margin-bottom: 20px;
+}
+
+.btn {
+    background-color: #2a2670;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background-color: #1e1c5a;
+}
+
+.btn.red {
+    background-color: #ff3b3b;
+}
+
+.btn.red:hover {
+    background-color: #c93030;
+}
+
+.table-container {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+th,
+td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #2a2670;
+    color: white;
+}
+
+td img {
+    max-width: 120px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.action-buttons button {
+    margin-right: 10px;
+}
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    max-width: 90%;
+    background-color: #2a2670;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 14px 20px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.5s ease, bottom 0.5s ease;
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+    bottom: 50px;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+}
+
+/* Modal box */
+.confirm-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+.confirm-box p {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+.confirm-box .buttons {
+    display: flex;
+    justify-content: space-around;
+}
+.confirm-box .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+.confirm-box .btn.red {
+    background-color: #e53935;
+    color: #fff;
+}
+.delete-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 9999;
+}
+.delete-toast.show {
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    td img {
+        max-width: 80px;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}

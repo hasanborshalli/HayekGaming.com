@@ -1,0 +1,51 @@
+/* Style the pagination container */
+nav[role="navigation"] {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* Style pagination list */
+nav[role="navigation"] ul {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+/* Style each page item */
+nav[role="navigation"] li {
+    display: inline-block;
+}
+
+/* Page link */
+nav[role="navigation"] a,
+nav[role="navigation"] span {
+    display: inline-block;
+    padding: 10px 14px;
+    background-color: #2a2670;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect */
+nav[role="navigation"] a:hover {
+    background-color: #1e1c5a;
+}
+
+/* Active page */
+nav[role="navigation"] .active span {
+    background-color: #ff3b3b;
+    cursor: default;
+}
+
+/* Disabled buttons */
+nav[role="navigation"] .disabled {
+    display: none ;
+    background-color: #ccc ;
+    color: #666;
+    cursor: not-allowed;
+}

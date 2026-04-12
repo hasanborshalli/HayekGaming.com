@@ -3,7 +3,7 @@
     <h2>Description</h2>
     <div class="small-description" id="descriptionText">
         <p>
-            {!!$description !!}
+            {!! nl2br(e($description)) !!}
         </p>
     </div>
     <button class="toggle-btn" id="toggleDescriptionBtn">View More</button>

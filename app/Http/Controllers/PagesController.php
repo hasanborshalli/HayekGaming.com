@@ -12,6 +12,7 @@ use App\Models\SubCategory;
 use App\Models\Type;
 use App\Models\Watch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 class PagesController extends Controller
 {
@@ -38,9 +39,9 @@ $featuredProducts = Product::with('category')
     ->take(9)->get();
 
 // Categories with subcategories (used in navbar on EVERY page)
-$categories = Category::with('subcategories')->get();
+$categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $comingSoon=Coming::first();
-        $movingSentence=Sentence::first();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
         $controllers=Product::where('category_id',1)->where('sub_category_id',5)->orderBy('created_at','desc')->take(7)->get();
@@ -52,8 +53,8 @@ $categories = Category::with('subcategories')->get();
     public function productDetailsPage(Product $product)
     {
         $hasGameTypes=false;
-        $movingSentence=Sentence::first();
-        $categories = Category::with('subcategories')->get();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $relatedProductsQuery = Product::where('category_id', $product->category_id)
         ->where('sub_category_id', $product->sub_category_id)
         ->where('id', '!=', $product->id)
@@ -78,8 +79,8 @@ $categories = Category::with('subcategories')->get();
     }
     public function watchDetailsPage(Watch $watch){
 
-        $movingSentence=Sentence::first();
-        $categories = Category::with('subcategories')->get();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
        $relatedProducts = Watch::orderBy('created_at','desc')->take(5)->get();
         $features=json_decode($watch->features, true);
         $boxContents=json_decode($watch->box_contents, true);
@@ -90,11 +91,11 @@ $categories = Category::with('subcategories')->get();
     }
     public function productsPage(Category $category)
     {
-        $movingSentence=Sentence::first();
-        $categories = Category::with('subcategories')->get();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
-        $products=$category->products()->orderBy('created_at','desc')->paginate(12);
+        $products=$category->products()->with('category')->orderBy('created_at','desc')->paginate(12);
         return view('productsPage', ['movingSentence'=>$movingSentence->sentence,'categories' => $categories,'category'=>$category,'products'=>$products,'cartQuantity'=>$cartQuantity,'pageType'=>'product']);
     }
 public function productsBySubPage(SubCategory $subCategory)
@@ -102,12 +103,12 @@ public function productsBySubPage(SubCategory $subCategory)
     if ($subCategory->name === 'Games') {
         return redirect()->route('allGamesRoute', ['subCategory' => $subCategory->id]);
     }
-            $movingSentence=Sentence::first();
+            $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
 
-    $categories = Category::with('subcategories')->get();
+    $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
     $cart = session('cart_items', []);
     $cartQuantity = count($cart);
-    $products=$subCategory->products()->orderBy('created_at','desc')->paginate(12);
+    $products=$subCategory->products()->with('category')->orderBy('created_at','desc')->paginate(12);
     return view('productsBySub', [
         'movingSentence'=>$movingSentence->sentence,
         'categories' => $categories,
@@ -121,29 +122,30 @@ public function productsBySubPage(SubCategory $subCategory)
 
     public function productsByGameType(SubCategory $subCategory, GameType $gameType)
     {
-                $movingSentence=Sentence::first();
+                $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
 
-                 $categories = Category::with('subcategories')->get();
+                 $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
                 $gameTypes=GameType::all();
         $cart = session('cart_items', []);
         $cartQuantity = count($cart); 
 
         $products = $gameType->products()
+                             ->with('category')
                              ->where('sub_category_id', $subCategory->id)
-                             ->orderBy('created_at', 'desc') 
+                             ->orderBy('created_at', 'desc')
                              ->paginate(24);
         
         return view('productsBySub', ['movingSentence'=>$movingSentence->sentence,'categories' => $categories,'gameType'=>$gameType,'isGameType'=>true,'products'=>$products,'subCategory'=>$subCategory,'gameTypes'=>$gameTypes,'cartQuantity'=>$cartQuantity]);
     }
     public function productsByAllGames(SubCategory $subCategory)
     {
-                $movingSentence=Sentence::first();
+                $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
 
-        $categories = Category::with('subcategories')->get();
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $gameTypes=GameType::all();
         $cart = session('cart_items', []);
         $cartQuantity = count($cart); 
-        $products=$subCategory->products()->orderBy('created_at', 'desc')->simplePaginate(12);
+        $products=$subCategory->products()->with('category')->orderBy('created_at', 'desc')->simplePaginate(12);
         return view('productsBySub', ['movingSentence'=>$movingSentence->sentence,'categories' => $categories,'gameType'=>"All Games",'isGameType'=>true,'products'=>$products,'subCategory'=>$subCategory,'gameTypes'=>$gameTypes,'cartQuantity'=>$cartQuantity]);
     }
     public function loginPage()
@@ -158,7 +160,7 @@ public function productsBySubPage(SubCategory $subCategory)
     public function manageProductsPage()
     {
         $products=Product::orderBy('created_at', 'desc') ->paginate(12);
-        $categories = Category::with('subcategories')->get();
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $gameTypes=GameType::all();
         return view('productsManage', ['products'=>$products,'categories'=>$categories,'gameTypes'=>$gameTypes]);
     
@@ -186,7 +188,7 @@ public function productsBySubPage(SubCategory $subCategory)
     }
     public function addProductPage()
     {
-        $categories = Category::with('subcategories')->get();
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $gameTypes=GameType::all();
         return view('addProduct', ['categories'=>$categories,'gameTypes'=>$gameTypes]);
     }
@@ -208,7 +210,7 @@ public function productsBySubPage(SubCategory $subCategory)
     }
     public function editProductPage(Product $product)
     {
-        $categories = Category::with('subcategories')->get();
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $gameTypes=GameType::all();
 $decodedFeatures = json_decode($product->features ?? '[]', true);
 $decodedBox = json_decode($product->box_contents ?? '[]', true);
@@ -243,8 +245,8 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
     }
     public function cartPage()
     {
-        $categories = Category::with('subcategories')->get();
-        $movingSentence=Sentence::first();
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
          $productIds = collect($cart)->where('type', 'product')->pluck('id');
@@ -259,18 +261,18 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
     }
     public function checkoutPage()
     {
-        $movingSentence=Sentence::first();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
-        $categories = Category::with('subcategories')->get();
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         return view('checkout', ['movingSentence'=>$movingSentence->sentence,"cartQuantity"=>$cartQuantity,'categories'=>$categories]);
     }
     public function ThankyouPage(Request $request)
 {
-    $movingSentence = Sentence::first();
+    $movingSentence = Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
     $cart = session('cart_items', []);
     $cartQuantity = count($cart);
-    $categories = Category::with('subcategories')->get();
+    $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
 
     $orderNumber = $request->input('orderNumber');
     $order = Order::find($orderNumber);
@@ -291,18 +293,17 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
         . "Total Price: $" . "{$order->total}%0A%0A"
         . "Items Ordered:%0A";
 
+    // Bulk-fetch all products and watches in 2 queries instead of N queries
+    $productIds = $orderItems->whereNotNull('product_id')->pluck('product_id');
+    $watchIds   = $orderItems->whereNotNull('watch_id')->pluck('watch_id');
+    $products   = \App\Models\Product::whereIn('id', $productIds)->get()->keyBy('id');
+    $watches    = \App\Models\Watch::whereIn('id', $watchIds)->get()->keyBy('id');
+
     foreach ($orderItems as $item) {
-        // Check if this row belongs to a product or a watch
-        if (!empty($item->product_id)) {
-            $product = \App\Models\Product::find($item->product_id);
-            if ($product) {
-                $message .= "- {$product->name} (Qty: {$item->quantity})%0A";
-            }
-        } elseif (!empty($item->watch_id)) {
-            $watch = \App\Models\Watch::find($item->watch_id);
-            if ($watch) {
-                $message .= "- {$watch->name} (Qty: {$item->quantity})%0A";
-            }
+        if (!empty($item->product_id) && isset($products[$item->product_id])) {
+            $message .= "- {$products[$item->product_id]->name} (Qty: {$item->quantity})%0A";
+        } elseif (!empty($item->watch_id) && isset($watches[$item->watch_id])) {
+            $message .= "- {$watches[$item->watch_id]->name} (Qty: {$item->quantity})%0A";
         }
     }
 
@@ -345,8 +346,8 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
     }
     public function comingSoonPage()
     {
-        $movingSentence=Sentence::first();
-        $categories = Category::with('subcategories')->get();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
         $comingSoonGames=ComingProduct::paginate(12);
@@ -355,8 +356,8 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
     }
     public function watchesPage()
     {
-        $movingSentence=Sentence::first();
-        $categories = Category::with('subcategories')->get();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
        $watches=Watch::with('type')
@@ -366,8 +367,8 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
     }
     public function braceletsPage()
     {
-        $movingSentence=Sentence::first();
-        $categories = Category::with('subcategories')->get();
+        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
        $watches=Watch::with('type')
@@ -376,11 +377,11 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
        return view('watches', ['path'=>$path,'watches'=>$watches,'movingSentence'=>$movingSentence->sentence,'categories' => $categories,'cartQuantity'=>$cartQuantity]);
     }
     public function sentencePage(){
-    $sentence=Sentence::first();
+    $sentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
         return view('sentenceManage',['sentence'=>$sentence->sentence]);
     }
     public function categoriesPage(){
-$categories = Category::with('subcategories')->get();
+$categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
     return view('categories',['categories'=>$categories]);    
     }
     public function addCategoryPage(){

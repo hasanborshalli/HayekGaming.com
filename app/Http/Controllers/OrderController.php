@@ -170,26 +170,30 @@ public function order(Request $request)
         return redirect('/cart')->with('error', 'Invalid order total.');
     }
 
-    // 💾 Create order
-    $fields['total'] = $totalPrice;
-    $order = Order::create($fields);
+    // 💾 Create order and items atomically
+    $order = DB::transaction(function () use ($fields, $totalPrice, $items) {
+        $fields['total'] = $totalPrice;
+        $order = Order::create($fields);
 
-    // 💿 Insert items into order_items
-    foreach ($items as $orderedItem) {
-        $itemId = $orderedItem['item_id'];
-        $quantity = (int) $orderedItem['quantity'];
-        $type = $orderedItem['type'] ?? 'product';
+        // 💿 Insert items into order_items
+        foreach ($items as $orderedItem) {
+            $itemId = $orderedItem['item_id'];
+            $quantity = (int) $orderedItem['quantity'];
+            $type = $orderedItem['type'] ?? 'product';
 
-        DB::table('order_items')->insert([
-            'order_id' => $order->id,
-            'product_id' => $type === 'product' ? $itemId : null,
-            'watch_id' => $type === 'watch' ? $itemId : null, // 👈 add this column to your table
-            'quantity' => $quantity,
-            'type' => $type, // optional but useful
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-    }
+            DB::table('order_items')->insert([
+                'order_id' => $order->id,
+                'product_id' => $type === 'product' ? $itemId : null,
+                'watch_id' => $type === 'watch' ? $itemId : null,
+                'quantity' => $quantity,
+                'type' => $type,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+        }
+
+        return $order;
+    });
 
     // 🧹 Clear cart/session
     session()->forget('ordered_items');

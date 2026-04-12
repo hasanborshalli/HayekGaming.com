@@ -73,8 +73,8 @@ class WatchesController extends Controller
      public function deleteWatch(Watch $watch)
     {
         foreach ([$watch->image,$watch->image1,$watch->image2,$watch->image3,$watch->image4,$watch->image5,$watch->image6] as $img) {
-                if ($watch->$img && Storage::exists('watches/' . $watch->image)) {
-                    Storage::delete('watches/' . $watch->image);
+                if ($img && Storage::exists('watches/' . $img)) {
+                    Storage::delete('watches/' . $img);
                 }
         }
         $watch->delete();

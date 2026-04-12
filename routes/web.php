@@ -43,7 +43,7 @@ Route::middleware(['log'])->group(function () {
     Route::get('/thankyou', [PagesController::class,'ThankyouPage']);
     
     Route::get('/admin/login', [PagesController::class,'loginPage'])->middleware('guest')->name('login');
-    Route::post('/admin/login', [AuthController::class,'login'])->middleware('guest');
+    Route::post('/admin/login', [AuthController::class,'login'])->middleware(['guest', 'throttle:5,1']);
 });
 Route::get('/logout', [AuthController::class,'Logout'])->middleware('auth');
 

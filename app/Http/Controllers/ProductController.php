@@ -156,9 +156,9 @@ class ProductController extends Controller
     }
     public function deleteProduct(Product $product)
     {
-        foreach ([$product->image,$product->image1,$product->image2,$product->image3,$product->image4] as $img) {
-                if ($product->$img && Storage::exists('products/' . $product->image)) {
-                    Storage::delete('products/' . $product->image);
+        foreach ([$product->image,$product->image1,$product->image2,$product->image3,$product->image4,$product->image5,$product->image6] as $img) {
+                if ($img && Storage::exists('products/' . $img)) {
+                    Storage::delete('products/' . $img);
                 }
         }
         $product->delete();
@@ -172,6 +172,7 @@ class ProductController extends Controller
            'search'=>['required','max:255']
         ]);
         $products=Product::search($fields['search']) ->orderBy('created_at', 'desc') ->paginate(12);
+        $products->getCollection()->load('category');
         $categories=Category::all();
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
@@ -242,9 +243,6 @@ public function search(Request $request)
     $searchStatement = implode(', ', $selectedGameTypeNames);
 
     $products = Product::where('sub_category_id', $subCategoryId)
-        ->whereHas('gameTypes', function ($query) use ($selectedGameTypeIds) {
-            $query->whereIn('game_types.id', $selectedGameTypeIds);
-        })
         ->with('gameTypes', 'category')
         ->whereIn('id', function ($query) use ($selectedGameTypeIds) {
             $query->select('product_id')

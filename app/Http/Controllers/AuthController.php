@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sentence;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -35,7 +35,7 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed']
         ]);
 
-        $user = User::first(); 
+        $user = Auth::user();
         // Check if the old password matches
         if (!Hash::check($fields['oldPassword'], $user->password)) {
             return back()->with(['oldPassword' => 'The old password is incorrect.']);
@@ -53,6 +53,7 @@ class AuthController extends Controller
         ]);
         $sentence=Sentence::first();
         $sentence->update($fields);
+        Cache::forget('moving_sentence');
         return redirect('/admin/sentence')->with('message', 'Sentence Edited Successfully');
     }
 }

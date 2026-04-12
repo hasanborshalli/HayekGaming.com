@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -29,11 +30,13 @@ class CategoryController extends Controller
         }
     }
 
+    Cache::forget('nav_categories');
     return redirect('/admin/categories')->with('message', 'Category added successfully.');
 }
 public function deleteCategory(Category $category)
     {
         $category->delete();
+        Cache::forget('nav_categories');
         return response()->json(['status'=>"removed"]);
     }
  public function editCategory(Request $request, Category $category)
@@ -69,12 +72,14 @@ public function deleteCategory(Category $category)
         }
     }
 
+    Cache::forget('nav_categories');
     return redirect('/admin/categories')->with('message', 'Category updated successfully.');
 }
 
 
 public function deleteSub(SubCategory $subCategory){
     $subCategory->delete();
+    Cache::forget('nav_categories');
     return response()->json(['status'=>"removed"]);
 }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
 {
+    // Share cartQuantity with every view so controllers don't each need to read the session
+    View::composer('*', function ($view) {
+        $view->with('cartQuantity', count(session('cart_items', [])));
+    });
+
     if (env('DB_LOG_QUERIES')) {
         DB::listen(function ($query) {
 

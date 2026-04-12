@@ -30,18 +30,53 @@
 	<link rel="icon" sizes="32x32" href="/img/white-logo.svg">
 	<link rel="stylesheet" href="/css/navbar.css" />
 	<link rel="stylesheet" href="/css/home.css" />
+	<link rel="stylesheet" href="/css/carousel.css">
 	<link rel="stylesheet" href="/css/footer.css">
 	<link rel="stylesheet" href="/css/sidebar.css">
+	<link rel="stylesheet" href="/css/productsList.css">
 	<link rel="stylesheet" href="/css/toast.css">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/css/fonts.css" />
+	<link rel="stylesheet" href="/css/fonts.css" />
 
 	<title>Hayek Gaming Ground</title>
 </head>
 
 <body>
 	<x-navbar :categories="$categories" cartQuantity="{{$cartQuantity}}" />
-	
+	<div class="whole-carousel">
+		<div class="carousel-left">
+			@php
+			$prevIndex = ($activeIndex - 1 + $banners->count()) % $banners->count();
+			$prevBanner = $banners[$prevIndex];
+			@endphp
+			<img src="/storage/banners/{{$prevBanner->image}}" alt="" id="prevBanner">
+		</div>
+		<section class="carousel-wrapper">
+			<div class="carousel-container">
+				<div class="carousel-track">
+					@foreach ($banners as $banner)
+					<x-image-container image="{{ $banner->image }}" mobile-image="{{ $banner->mobile_image }}"
+						small-image="{{ $banner->small_image }}" id="{{ $banner->product->id }}"
+						name="{{$banner->product->name}}" />
+					@endforeach
+				</div>
+
+			</div>
+			<div class="carousel-dots">
+				<span class="dot active"></span>
+				@for ($i=0;$i<$banners->count()-1;$i++)
+					<span class="dot"></span>
+					@endfor
+			</div>
+		</section>
+		<div class="carousel-right">
+			@php
+			$nextIndex = ($activeIndex + 1) % $banners->count();
+			$nextBanner = $banners[$nextIndex];
+			@endphp
+			<img src="/storage/banners/{{$nextBanner->image}}" alt="" id="nextBanner">
+		</div>
+	</div>
 	<section class="boxes-container">
 		<div class="boxes">
 			<x-category-box image="/img/drones.webp" title="Drones" path="/products/10" />
@@ -50,6 +85,117 @@
 			<x-category-box image="/img/Elite Gear.webp" title="Gaming Setup" path="/products/5" />
 		</div>
 	</section>
+	<section class="new">
+		<div class="shadow"></div>
+		<div class="section-title">
+			<h1>Newest Release</h1>
+		</div>
+
+		<div class="products">
+			@foreach ($newproducts as $product)
+			<x-new-product-card image="{{$product->image}}" title="{{$product->name}}" price="{{$product->price}}"
+				salePrice="{{$product->sale}}" category="{{$product->category->slogan}}" id="{{$product->id}}"
+				isAvailable="{{$product->is_available}}" forceColoredCart="{{true}}" />
+			@endforeach
+		</div>
+	</section>
+	<section class="featured">
+		<div class="shadow"></div>
+
+		<div class="section-title">
+			<h1>Featured Products</h1>
+		</div>
+
+		<div class="products">
+			@foreach ($featuredProducts as $product)
+			<x-new-product-card image="{{$product->image}}" title="{{$product->name}}" price="{{$product->price}}"
+				salePrice="{{$product->sale}}" category="{{$product->category->slogan}}" id="{{$product->id}}"
+				isAvailable="{{$product->is_available}}" forceColoredCart="{{true}}" />
+			@endforeach
+		</div>
+	</section>
+	<section class="ps5-controllers">
+		<div class="header">
+			<h2>PS5 Controllers</h2>
+			<button class="view-all" onclick="window.location.href='/products/category/5'">View All</button>
+		</div>
+		<div class="controller-carousel">
+			@foreach($controllers as $controller)
+			<div class="controller-card">
+				<a href="/product/{{$controller->id}}" style="text-decoration: none">
+					<div class="controller-image-wrapper">
+						<img src="/storage/products/{{$controller->image}}"
+							alt="{{ html_entity_decode($controller->name) }}" loading="lazy" class="controller-img" />
+						@if($controller->sale)
+						<div class="sale-badge">SALE</div>
+						@endif
+					</div>
+					<div class="controller-info-container">
+						<h3 style="color:black">{{ html_entity_decode($controller->name) }}</h3>
+					</div>
+
+					@if($controller->sale)
+					<div class="product-price">
+						<span class="old-price">${{ number_format($controller->price, 2) }}</span>
+						<span class="sale-price">${{ number_format($controller->sale, 2) }}</span>
+					</div>
+					@else
+					<p class="price">${{ number_format($controller->price, 2) }}</p>
+					@endif
+
+					<button onclick="addToCart({{ $controller->id }})" style="font-family: 'Poppins', sans-serif;">
+						Add to cart
+						<img src="/img/colored-cart.svg" class="cart-icon" />
+					</button>
+				</a>
+			</div>
+
+			@endforeach
+		</div>
+	</section>
+	<section class="watches-section">
+		<div class="header">
+			<h2>Watches</h2>
+			<button class="view-all" onclick="window.location.href='/watches'">View All</button>
+		</div>
+
+		<div class="watch-carousel">
+			@foreach($watches as $watch)
+			<div class="watch-card">
+				<a href="/watch/{{ $watch->id }}" style="text-decoration: none">
+					<div class="watch-image-wrapper">
+						<img src="/storage/watches/{{ $watch->image }}" alt="{{ html_entity_decode($watch->name) }}"
+							loading="lazy" class="watch-img" />
+						@if($watch->sale)
+						<div class="sale-badge">SALE</div>
+						@endif
+					</div>
+
+					<div class="watch-info-container">
+						<h3 style="color:black">{{ html_entity_decode($watch->name) }}</h3>
+					</div>
+
+					@if($watch->sale)
+					<div class="product-price">
+						<span class="old-price">${{ number_format($watch->price, 2) }}</span>
+						<span class="sale-price">${{ number_format($watch->sale, 2) }}</span>
+					</div>
+					@else
+					<p class="price">${{ number_format($watch->price, 2) }}</p>
+					@endif
+				</a>
+				<button onclick="addToCart({{ $watch->id }}, 'watch')" style="font-family: 'Poppins', sans-serif;">
+					Add to cart
+					<img src="/img/colored-cart.svg" class="cart-icon" />
+				</button>
+
+			</div>
+			@endforeach
+		</div>
+	</section>
+
+
+
 	<section class="info">
 		<div class="general-info">
 			<ul>
@@ -71,6 +217,7 @@
 
 	<x-footer :categories="$categories" movingSentence="{{$movingSentence}}" />
 	<div id="toast" class="toast"></div>
+	<script src="/js/home.js?v=1"></script>
 	<script src="/js/navbar.js"></script>
 	<script src="/js/order.js"></script>
 	<script>

@@ -6,7 +6,7 @@
 
     <div class="navbar-center">
         <div class="logo-mobile">
-            <a href="/"> <img src="/img/colored-logo.svg" alt="HGG Logo" loading="lazy" /></a>
+            <a href="/"> <img src="/img/colored-logo.webp" alt="HGG Logo" loading="lazy" /></a>
         </div>
         <form action="/search/products" method="GET">
             <input type="text" placeholder="Search the store" name="search" autocomplete="off" id="search" />

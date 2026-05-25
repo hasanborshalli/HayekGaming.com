@@ -156,6 +156,42 @@
     margin-top: 4px;
 }
 
+/* Pagination */
+.watches-page nav[aria-label="Pagination Navigation"] {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0;
+    gap: 8px;
+}
+
+.watches-page nav[aria-label="Pagination Navigation"] a {
+    background-color: white;
+    color: #cfa031;
+    border: 2px solid #cfa031;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.watches-page nav[aria-label="Pagination Navigation"] a:hover {
+    background-color: #cfa031;
+    color: white;
+}
+
+.watches-page nav[aria-label="Pagination Navigation"] span {
+    background-color: #f5f5f5;
+    color: #bdbdbd;
+    border: 2px solid #e0e0e0;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: default;
+}
+
 @media (max-width: 768px) {
     .watches-page .navbar {
         background-color: white;

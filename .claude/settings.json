@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\Lenovo\\\\Desktop\\\\hayekgaming\" | Where-Object { $_.PSIsContainer -eq $false } | Select-Object Name)"
+    ]
+  }
+}

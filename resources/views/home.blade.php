@@ -39,9 +39,37 @@
 	<link rel="stylesheet" href="/css/fonts.css" />
 
 	<title>Hayek Gaming Ground</title>
+	<style>
+		#page-loader {
+			position: fixed;
+			inset: 0;
+			background: #2a2670;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 99999;
+			transition: opacity 0.4s ease;
+		}
+		#page-loader.hidden {
+			opacity: 0;
+			pointer-events: none;
+		}
+		.loader-spinner {
+			width: 52px;
+			height: 52px;
+			border: 5px solid rgba(255, 255, 255, 0.2);
+			border-top-color: #ffffff;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+	</style>
 </head>
 
 <body>
+	<div id="page-loader"><div class="loader-spinner"></div></div>
 	<x-navbar :categories="$categories" cartQuantity="{{$cartQuantity}}" />
 	<div class="whole-carousel">
 		<div class="carousel-left">
@@ -217,6 +245,13 @@
 
 	<x-footer :categories="$categories" movingSentence="{{$movingSentence}}" />
 	<div id="toast" class="toast"></div>
+	<script>
+		window.addEventListener('load', function() {
+			var loader = document.getElementById('page-loader');
+			loader.classList.add('hidden');
+			setTimeout(function() { loader.remove(); }, 400);
+		});
+	</script>
 	<script src="/js/home.js?v=1"></script>
 	<script src="/js/navbar.js"></script>
 	<script src="/js/order.js"></script>

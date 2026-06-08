@@ -1,6 +1,6 @@
 <nav class="navbar">
     <div class="navbar-left">
-        <div class="burger"><img src="/img/burger.svg" loading="lazy" /></div>
+        <div class="burger"><img src="/img/burger.svg" width="24" height="24" loading="lazy" /></div>
         <a href="/"><img src="/img/white-logo.svg" alt="HGG Logo" class="logo" /></a>
     </div>
 

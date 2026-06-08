@@ -31,10 +31,16 @@
 	<link rel="stylesheet" href="/css/navbar.css" />
 	<link rel="stylesheet" href="/css/home.css" />
 	<link rel="stylesheet" href="/css/carousel.css">
-	<link rel="stylesheet" href="/css/footer.css">
-	<link rel="stylesheet" href="/css/sidebar.css">
-	<link rel="stylesheet" href="/css/productsList.css">
-	<link rel="stylesheet" href="/css/toast.css">
+	<link rel="stylesheet" href="/css/footer.css" media="print" onload="this.media='all'">
+	<link rel="stylesheet" href="/css/sidebar.css" media="print" onload="this.media='all'">
+	<link rel="stylesheet" href="/css/productsList.css" media="print" onload="this.media='all'">
+	<link rel="stylesheet" href="/css/toast.css" media="print" onload="this.media='all'">
+	<noscript>
+		<link rel="stylesheet" href="/css/footer.css">
+		<link rel="stylesheet" href="/css/sidebar.css">
+		<link rel="stylesheet" href="/css/productsList.css">
+		<link rel="stylesheet" href="/css/toast.css">
+	</noscript>
 	@if($banners->isNotEmpty())
 	<link rel="preload" as="image" href="/storage/banners/{{ $banners->first()->image }}">
 	@endif
@@ -238,11 +244,24 @@
 			</ul>
 		</div>
 		<div class="map">
-			<iframe
-				src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d106045.32744561206!2d35.447177911202736!3d33.84026439283012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x151f190dacbe9df3%3A0x4a0513f5fbc00c9f!2shttps%3A%2F%2Fmaps.app.goo.gl%2F2wUnruz8XEdamk8DA%2C%20Hadath%200000!3m2!1d33.840291799999996!2d35.5295791!5e0!3m2!1sen!2slb!4v1746635875629!5m2!1sen!2slb"
-				height="380" style="border:0;" allowfullscreen="" loading="lazy"
-				referrerpolicy="no-referrer-when-downgrade"></iframe>
+			<div id="map-placeholder" style="height:380px;width:100%;background:#e0e0e0;"></div>
 		</div>
+		<script>
+			new IntersectionObserver(function(entries, observer) {
+				if (entries[0].isIntersecting) {
+					var placeholder = document.getElementById('map-placeholder');
+					var iframe = document.createElement('iframe');
+					iframe.src = 'https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d106045.32744561206!2d35.447177911202736!3d33.84026439283012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x151f190dacbe9df3%3A0x4a0513f5fbc00c9f!2shttps%3A%2F%2Fmaps.app.goo.gl%2F2wUnruz8XEdamk8DA%2C%20Hadath%200000!3m2!1d33.840291799999996!2d35.5295791!5e0!3m2!1sen!2slb!4v1746635875629!5m2!1sen!2slb';
+					iframe.height = '380';
+					iframe.style.border = '0';
+					iframe.width = '100%';
+					iframe.allowFullscreen = true;
+					iframe.referrerPolicy = 'no-referrer-when-downgrade';
+					placeholder.replaceWith(iframe);
+					observer.disconnect();
+				}
+			}, { rootMargin: '200px' }).observe(document.getElementById('map-placeholder'));
+		</script>
 	</section>
 
 

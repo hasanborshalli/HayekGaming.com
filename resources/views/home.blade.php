@@ -35,6 +35,9 @@
 	<link rel="stylesheet" href="/css/sidebar.css">
 	<link rel="stylesheet" href="/css/productsList.css">
 	<link rel="stylesheet" href="/css/toast.css">
+	@if($banners->isNotEmpty())
+	<link rel="preload" as="image" href="/storage/banners/{{ $banners->first()->image }}">
+	@endif
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link rel="stylesheet" href="/css/fonts.css" />
 
@@ -85,7 +88,7 @@
 					@foreach ($banners as $banner)
 					<x-image-container image="{{ $banner->image }}" mobile-image="{{ $banner->mobile_image }}"
 						small-image="{{ $banner->small_image }}" id="{{ $banner->product->id }}"
-						name="{{$banner->product->name}}" />
+						name="{{$banner->product->name}}" :priority="$loop->first" />
 					@endforeach
 				</div>
 

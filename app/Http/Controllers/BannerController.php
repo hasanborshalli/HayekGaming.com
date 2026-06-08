@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,7 @@ class BannerController extends Controller
         $fields['small_image']=$customName;
         
         Banner::create($fields);
+        Cache::forget('home_banners');
         return redirect('/admin/banners')->with('message', 'Banner Added Successfully');
     }
     public function editBanner(Request $request, Banner $banner)
@@ -73,6 +75,7 @@ class BannerController extends Controller
             $fields['small_image']=$customName;
         }
         $banner->update($fields);
+        Cache::forget('home_banners');
         return redirect('/admin/banners')->with('message', 'Banner Updated Successfully');
     }
     public function deleteBanner(Banner $banner)
@@ -84,6 +87,7 @@ class BannerController extends Controller
                 Storage::delete('banners/' . $banner->image);
             }
         $banner->delete();
+        Cache::forget('home_banners');
         return response()->json(['status'=>"removed"]);
     }
 }

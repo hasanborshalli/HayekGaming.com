@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Sentence;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -78,6 +79,9 @@ class ProductController extends Controller
             $gameTypeIds = GameType::whereIn('name', $request->gameTypes)->pluck('id');
             $product->gameTypes()->sync($gameTypeIds);
         }
+        Cache::forget('home_new_products');
+        Cache::forget('home_featured');
+        Cache::forget('home_controllers');
         return redirect('/admin/products')->with('message', 'Product Added Successfully');
     }
     public function editProduct(Request $request, Product $product)
@@ -151,6 +155,9 @@ class ProductController extends Controller
             // Remove all associated game types if none are provided
             $product->gameTypes()->sync([]);
         }
+        Cache::forget('home_new_products');
+        Cache::forget('home_featured');
+        Cache::forget('home_controllers');
         return redirect('/admin/products')->with('message', 'Product Edited Successfully');
 
     }
@@ -162,6 +169,9 @@ class ProductController extends Controller
                 }
         }
         $product->delete();
+        Cache::forget('home_new_products');
+        Cache::forget('home_featured');
+        Cache::forget('home_controllers');
         return response()->json(['status'=>"removed"]);
     }
     public function productsSearch(Request $request)

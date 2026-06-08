@@ -23,30 +23,35 @@ class PagesController extends Controller
     }
     public function homePage()
     {
-        // In homePage():
-$banners = Banner::with('product')->orderBy('created_at', 'desc')->get();
+        $banners = Cache::remember('home_banners', 600, fn() =>
+            Banner::with('product')->orderBy('created_at', 'desc')->get()
+        );
 
-$newproducts = Product::with('category')
-    ->where('isNew', true)
-    ->where('is_available', true)
-    ->orderBy('created_at', 'desc')
-    ->take(9)->get();
+        $newproducts = Cache::remember('home_new_products', 600, fn() =>
+            Product::with('category')->where('isNew', true)->where('is_available', true)
+                ->orderBy('created_at', 'desc')->take(9)->get()
+        );
 
-$featuredProducts = Product::with('category')
-    ->where('featured', true)
-    ->where('is_available', true)
-    ->orderBy('created_at', 'desc')
-    ->take(9)->get();
+        $featuredProducts = Cache::remember('home_featured', 600, fn() =>
+            Product::with('category')->where('featured', true)->where('is_available', true)
+                ->orderBy('created_at', 'desc')->take(9)->get()
+        );
 
-// Categories with subcategories (used in navbar on EVERY page)
-$categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
-        $comingSoon=Coming::first();
-        $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
+        $categories = Cache::remember('nav_categories', 3600, fn() => Category::with('subcategories')->get());
+        $comingSoon = Coming::first();
+        $movingSentence = Cache::remember('moving_sentence', 3600, fn() => Sentence::first());
         $cart = session('cart_items', []);
         $cartQuantity = count($cart);
-        $controllers=Product::where('category_id',1)->where('sub_category_id',5)->orderBy('created_at','desc')->take(7)->get();
-        $watches=Watch::where('featured',true)->where('is_available',true)->orderBy('created_at', 'desc') 
-                                   ->take(9)->get();
+
+        $controllers = Cache::remember('home_controllers', 600, fn() =>
+            Product::where('category_id', 1)->where('sub_category_id', 5)
+                ->orderBy('created_at', 'desc')->take(7)->get()
+        );
+
+        $watches = Cache::remember('home_watches', 600, fn() =>
+            Watch::where('featured', true)->where('is_available', true)
+                ->orderBy('created_at', 'desc')->take(9)->get()
+        );
         return view('home', ['watches'=>$watches,'categories' => $categories,'banners' => $banners,'newproducts'=>$newproducts,'featuredProducts' => $featuredProducts,'comingSoon'=>$comingSoon,'cartQuantity'=>$cartQuantity,'controllers'=>$controllers,'activeIndex' => 0,'movingSentence'=>$movingSentence->sentence]);
     }
     

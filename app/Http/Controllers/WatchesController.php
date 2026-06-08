@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Watch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -66,7 +67,7 @@ class WatchesController extends Controller
         }
         
         Watch::create($fields);
-
+        Cache::forget('home_watches');
         return redirect('/admin/watches')->with('message', 'Watch Added Successfully');
    
     }
@@ -78,6 +79,7 @@ class WatchesController extends Controller
                 }
         }
         $watch->delete();
+        Cache::forget('home_watches');
         return response()->json(['status'=>"removed"]);
     }
     public function editWatch(Request $request, Watch $watch)
@@ -144,6 +146,7 @@ class WatchesController extends Controller
             $fields['is_available']=false;
         }
         $watch->update($fields);
+        Cache::forget('home_watches');
         return redirect('/admin/watches')->with('message', 'Watch Edited Successfully');
 
     }

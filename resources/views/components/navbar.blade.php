@@ -1,12 +1,12 @@
 <nav class="navbar">
     <div class="navbar-left">
         <div class="burger"><img src="/img/burger.svg" loading="lazy" /></div>
-        <a href="/"><img src="/img/white-logo.svg" alt="HGG Logo" class="logo" loading="lazy" /></a>
+        <a href="/"><img src="/img/white-logo.svg" alt="HGG Logo" class="logo" /></a>
     </div>
 
     <div class="navbar-center">
         <div class="logo-mobile">
-            <a href="/"> <img src="/img/colored-logo.webp" alt="HGG Logo" loading="lazy" /></a>
+            <a href="/"> <img src="/img/colored-logo.webp" alt="HGG Logo" /></a>
         </div>
         <form action="/search/products" method="GET">
             <input type="text" placeholder="Search the store" name="search" autocomplete="off" id="search" />

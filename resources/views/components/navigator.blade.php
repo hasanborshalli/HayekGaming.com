@@ -4,6 +4,9 @@
   <a href="/admin/watches">Manage Watches & Bracelets</a>
   <a href="/admin/categories">Manage Categories</a>
   <a href="/admin/orders">Manage Orders</a>
+  <a href="/admin/stock">Stock</a>
+  <a href="/admin/stock/purchases">Purchases</a>
+  <a href="/admin/stock/punch-orders">Punch Orders</a>
   <a href="/admin/banners">Manage Banners</a>
   <a href="/admin/comingSoon">Manage Coming Soon</a>
   <a href="/admin/sentence">Change Moving Sentence</a>
@@ -18,6 +21,9 @@
   <a href="/admin/watches">Manage Watches & Bracelets</a>
   <a href="/admin/categories">Manage Categories</a>
   <a href="/admin/orders">Manage Orders</a>
+  <a href="/admin/stock">Stock</a>
+  <a href="/admin/stock/purchases">Purchases</a>
+  <a href="/admin/stock/punch-orders">Punch Orders</a>
   <a href="/admin/banners">Manage Banners</a>
   <a href="/admin/comingSoon">Manage Coming Soon</a>
   <a href="/admin/sentence">Change Moving Sentence</a>

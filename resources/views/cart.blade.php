@@ -39,6 +39,9 @@
     <section class="cart-page">
         <div class="cart-container">
             <h2>Shopping Cart</h2>
+            @if (session('error'))
+            <p style="color:red">{{ session('error') }}</p>
+            @endif
             @if ($products->count() > 0 || $watches->count() > 0)
 
             <table>

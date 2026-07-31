@@ -38,6 +38,9 @@
     <section class="checkout-wrapper">
         <div class="checkout-container">
             <h2>Checkout Form</h2>
+            @if (session('error'))
+            <p style="color:red">{{ session('error') }}</p>
+            @endif
             <form action="/order" method="POST" class="checkout-form">
                 @csrf
                 <div class="form-group">

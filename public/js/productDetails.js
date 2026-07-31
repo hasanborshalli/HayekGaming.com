@@ -10,8 +10,12 @@ function changeImage(id, src) {
 }
 const quantity = document.getElementsByClassName("quantity-input")[0];
 function updateQuantity(sign) {
+    const max = quantity.getAttribute("max");
     if (sign === "+") {
-        quantity.value = parseInt(quantity.value) + 1;
+        const next = parseInt(quantity.value) + 1;
+        if (!max || next <= parseInt(max)) {
+            quantity.value = next;
+        }
     } else if (sign === "-") {
         if (quantity.value > 1) {
             quantity.value = parseInt(quantity.value) - 1;

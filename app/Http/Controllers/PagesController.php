@@ -7,6 +7,8 @@ use App\Models\ComingProduct;
 use App\Models\GameType;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\PunchOrder;
 use App\Models\Sentence;
 use App\Models\SubCategory;
 use App\Models\Type;
@@ -349,6 +351,138 @@ $boxContents = is_array($decodedBox) ? implode("\n", $decodedBox) : '';
 
         }
     }
+    protected function applyStockStatusFilter($query, string $status)
+    {
+        switch ($status) {
+            case 'untracked':
+                $query->whereNull('stock_quantity');
+                break;
+            case 'out':
+                $query->whereNotNull('stock_quantity')->where('stock_quantity', '<=', 0);
+                break;
+            case 'low':
+                $query->whereNotNull('stock_quantity')->where('stock_quantity', '>', 0)
+                    ->whereColumn('stock_quantity', '<=', 'stock_threshold');
+                break;
+            case 'ok':
+                $query->whereNotNull('stock_quantity')->whereColumn('stock_quantity', '>', 'stock_threshold');
+                break;
+        }
+    }
+
+    public function stockPage(Request $request)
+    {
+        $search = trim((string) $request->get('search', ''));
+        $status = $request->get('status', 'all');
+        $perPage = (int) $request->get('per_page', 50);
+        if (!in_array($perPage, [15, 50, 100, 200], true)) {
+            $perPage = 50;
+        }
+
+        $productsQuery = Product::query();
+        $watchesQuery = Watch::query();
+
+        if ($search !== '') {
+            $productsQuery->where('name', 'like', '%' . $search . '%');
+            $watchesQuery->where('name', 'like', '%' . $search . '%');
+        }
+
+        $this->applyStockStatusFilter($productsQuery, $status);
+        $this->applyStockStatusFilter($watchesQuery, $status);
+
+        $products = $productsQuery->orderBy('name')->paginate($perPage, ['*'], 'products_page')->withQueryString();
+        $watches = $watchesQuery->orderBy('name')->paginate($perPage, ['*'], 'watches_page')->withQueryString();
+
+        // Inventory value at retail (selling price), not cost — sale price when the item is on sale.
+        $stockValue = (DB::table('products')->whereNotNull('stock_quantity')->sum(DB::raw('stock_quantity * COALESCE(sale, price)')) ?? 0)
+            + (DB::table('watches')->whereNotNull('stock_quantity')->sum(DB::raw('stock_quantity * COALESCE(sale, price)')) ?? 0);
+
+        return view('stock', [
+            'products' => $products,
+            'watches' => $watches,
+            'stockValue' => $stockValue,
+            'search' => $search,
+            'status' => $status,
+            'perPage' => $perPage,
+        ]);
+    }
+
+    public function purchasesPage(Request $request)
+    {
+        $search = trim((string) $request->get('search', ''));
+        $from = $request->get('from');
+        $to = $request->get('to');
+
+        $query = Purchase::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('note', 'like', '%' . $search . '%')
+                    ->orWhereHas('items.product', fn ($q2) => $q2->where('name', 'like', '%' . $search . '%'))
+                    ->orWhereHas('items.watch', fn ($q2) => $q2->where('name', 'like', '%' . $search . '%'));
+            });
+        }
+        if ($from) {
+            $query->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $query->whereDate('created_at', '<=', $to);
+        }
+
+        $purchases = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
+
+        return view('purchases', ['purchases' => $purchases, 'search' => $search, 'from' => $from, 'to' => $to]);
+    }
+
+    public function addPurchasePage()
+    {
+        return view('addPurchase');
+    }
+
+    public function editPurchasePage(Purchase $purchase)
+    {
+        $purchase->load('items.product', 'items.watch');
+        return view('editPurchase', ['purchase' => $purchase]);
+    }
+
+    public function punchOrdersPage(Request $request)
+    {
+        $search = trim((string) $request->get('search', ''));
+        $from = $request->get('from');
+        $to = $request->get('to');
+
+        $query = PunchOrder::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('note', 'like', '%' . $search . '%')
+                    ->orWhereHas('items.product', fn ($q2) => $q2->where('name', 'like', '%' . $search . '%'))
+                    ->orWhereHas('items.watch', fn ($q2) => $q2->where('name', 'like', '%' . $search . '%'));
+            });
+        }
+        if ($from) {
+            $query->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $query->whereDate('created_at', '<=', $to);
+        }
+
+        $punchOrders = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
+
+        return view('punchOrders', ['punchOrders' => $punchOrders, 'search' => $search, 'from' => $from, 'to' => $to]);
+    }
+
+    public function addPunchOrderPage()
+    {
+        return view('addPunchOrder');
+    }
+
+    public function editPunchOrderPage(PunchOrder $punchOrder)
+    {
+        $punchOrder->load('items.product', 'items.watch');
+        return view('editPunchOrder', ['punchOrder' => $punchOrder]);
+    }
+
     public function comingSoonPage()
     {
         $movingSentence=Cache::remember('moving_sentence', 3600, fn() => Sentence::first());

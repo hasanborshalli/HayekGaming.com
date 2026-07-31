@@ -28,7 +28,10 @@ class Product extends Model
        'sale',
        'cost',
        'isNew',
-       'is_available'
+       'is_available',
+       'stock_quantity',
+       'stock_threshold',
+       'avg_cost'
        ];
     public function category(): BelongsTo
     {

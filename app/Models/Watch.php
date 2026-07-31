@@ -34,6 +34,9 @@ class Watch extends Model
        'color4',
        'color5',
        'color6',
+       'stock_quantity',
+       'stock_threshold',
+       'avg_cost',
     ];
      public function type(): BelongsTo
     {

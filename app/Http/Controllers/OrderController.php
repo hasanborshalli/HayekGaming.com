@@ -4,13 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\StockService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use App\Models\Watch;
 
 class OrderController extends Controller
 {
+    protected StockService $stock;
+
+    public function __construct(StockService $stock)
+    {
+        $this->stock = $stock;
+    }
+
     public function addCart(Request $request, $check = false)
 {
     $fields = $request->validate([
@@ -23,20 +32,41 @@ class OrderController extends Controller
     $quantity = $fields['quantity'];
     $type = $fields['type'];
 
-    // validate that it exists in the correct table
-    if ($type === 'product' && !\DB::table('products')->where('id', $itemId)->exists()) {
-        return response()->json(['status' => 'invalid']);
-    }
+    // validate that it exists in the correct table (and fetch stock info while we're at it)
+    $item = $type === 'watch' ? Watch::find($itemId) : Product::find($itemId);
 
-    if ($type === 'watch' && !\DB::table('watches')->where('id', $itemId)->exists()) {
+    if (!$item) {
         return response()->json(['status' => 'invalid']);
     }
 
     $cart = session('cart_items', []);
     $itemFound = false;
+    $existingQuantity = 0;
 
-    foreach ($cart as $key => $item) {
-        if ($item['id'] == $itemId && $item['type'] == $type) {
+    foreach ($cart as $cartItem) {
+        if ($cartItem['id'] == $itemId && $cartItem['type'] == $type) {
+            $existingQuantity = $cartItem['quantity'];
+        }
+    }
+
+    if ($item->stock_quantity !== null && ($existingQuantity + $quantity) > $item->stock_quantity) {
+        $message = $item->stock_quantity > 0
+            ? "Only {$item->stock_quantity} of \"{$item->name}\" left in stock."
+            : "\"{$item->name}\" is currently out of stock.";
+
+        if ($check) {
+            return redirect()->back()->with('error', $message);
+        }
+
+        return response()->json([
+            'status' => 'insufficientStock',
+            'message' => $message,
+            'available' => max(0, $item->stock_quantity - $existingQuantity),
+        ]);
+    }
+
+    foreach ($cart as $key => $cartItem) {
+        if ($cartItem['id'] == $itemId && $cartItem['type'] == $type) {
             $itemFound = true;
             $cart[$key]['quantity'] += $quantity;
         }
@@ -171,29 +201,38 @@ public function order(Request $request)
     }
 
     // 💾 Create order and items atomically
-    $order = DB::transaction(function () use ($fields, $totalPrice, $items) {
-        $fields['total'] = $totalPrice;
-        $order = Order::create($fields);
+    try {
+        $order = DB::transaction(function () use ($fields, $totalPrice, $items) {
+            $fields['total'] = $totalPrice;
+            $order = Order::create($fields);
 
-        // 💿 Insert items into order_items
-        foreach ($items as $orderedItem) {
-            $itemId = $orderedItem['item_id'];
-            $quantity = (int) $orderedItem['quantity'];
-            $type = $orderedItem['type'] ?? 'product';
+            // 💿 Insert items into order_items
+            foreach ($items as $orderedItem) {
+                $itemId = (int) $orderedItem['item_id'];
+                $quantity = (int) $orderedItem['quantity'];
+                $type = $orderedItem['type'] ?? 'product';
 
-            DB::table('order_items')->insert([
-                'order_id' => $order->id,
-                'product_id' => $type === 'product' ? $itemId : null,
-                'watch_id' => $type === 'watch' ? $itemId : null,
-                'quantity' => $quantity,
-                'type' => $type,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-        }
+                // 📉 Re-validate and decrement stock at the moment of purchase (closes the race
+                // between add-to-cart and checkout)
+                $this->stock->decreaseStock($type, $itemId, $quantity);
 
-        return $order;
-    });
+                DB::table('order_items')->insert([
+                    'order_id' => $order->id,
+                    'product_id' => $type === 'product' ? $itemId : null,
+                    'watch_id' => $type === 'watch' ? $itemId : null,
+                    'quantity' => $quantity,
+                    'type' => $type,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+            }
+
+            return $order;
+        });
+    } catch (ValidationException $e) {
+        $message = collect($e->errors())->flatten()->first() ?? 'One of the items in your cart is no longer available.';
+        return redirect('/cart')->with('error', $message);
+    }
 
     // 🧹 Clear cart/session
     session()->forget('ordered_items');
@@ -206,13 +245,19 @@ public function order(Request $request)
 
     public function DeleteOrder(order $order)
     {
-        if($order->delete()) {
-            return response()->json(['status'=>"removed"]);
+        DB::transaction(function () use ($order) {
+            $items = DB::table('order_items')->where('order_id', $order->id)->get();
+            foreach ($items as $item) {
+                $type = $item->type ?? 'product';
+                $itemId = $item->product_id ?? $item->watch_id;
+                if ($itemId) {
+                    $this->stock->increaseStockPlain($type, (int) $itemId, (int) $item->quantity);
+                }
+            }
+            $order->delete();
+        });
 
-        } else {
-            return response()->json(['status'=>"failed"]);
-
-        }
+        return response()->json(['status'=>"removed"]);
     }
     public function FinishOrder(order $order)
     {
@@ -238,47 +283,80 @@ public function order(Request $request)
 
     $totalPrice = 0;
 
-    // ✅ Loop through all request items
-    foreach ($request->all() as $key => $value) {
-        // 🟢 Product items
-        if (str_starts_with($key, 'item_product_')) {
-            $productId = str_replace('item_product_', '', $key);
-            $quantity = (int) $request->input('quantity_product_' . $productId);
+    try {
+        DB::transaction(function () use ($request, $order, &$totalPrice) {
+            // ✅ Loop through all request items
+            foreach ($request->all() as $key => $value) {
+                // 🟢 Product items
+                if (str_starts_with($key, 'item_product_')) {
+                    $productId = str_replace('item_product_', '', $key);
+                    $quantity = (int) $request->input('quantity_product_' . $productId);
 
-            $product = \App\Models\Product::find($productId);
-            if ($product && $quantity >= 0) {
-                DB::table('order_items')
-                    ->where('order_id', $order->id)
-                    ->where('product_id', $productId)
-                    ->update([
-                        'quantity' => $quantity,
-                        'updated_at' => now(),
-                    ]);
+                    $product = \App\Models\Product::find($productId);
+                    if ($product && $quantity >= 0) {
+                        $currentRow = DB::table('order_items')
+                            ->where('order_id', $order->id)
+                            ->where('product_id', $productId)
+                            ->first();
+                        $oldQuantity = $currentRow->quantity ?? 0;
+                        $delta = $quantity - $oldQuantity;
 
-                $price = $product->sale ?? $product->price;
-                $totalPrice += $price * $quantity;
+                        if ($delta > 0) {
+                            $this->stock->decreaseStock('product', (int) $productId, $delta);
+                        } elseif ($delta < 0) {
+                            $this->stock->increaseStockPlain('product', (int) $productId, -$delta);
+                        }
+
+                        DB::table('order_items')
+                            ->where('order_id', $order->id)
+                            ->where('product_id', $productId)
+                            ->update([
+                                'quantity' => $quantity,
+                                'updated_at' => now(),
+                            ]);
+
+                        $price = $product->sale ?? $product->price;
+                        $totalPrice += $price * $quantity;
+                    }
+                }
+
+                // 🟣 Watch items
+                elseif (str_starts_with($key, 'item_watch_')) {
+                    $watchId = str_replace('item_watch_', '', $key);
+                    $quantity = (int) $request->input('quantity_watch_' . $watchId);
+
+                    $watch = \App\Models\Watch::find($watchId);
+                    if ($watch && $quantity >= 0) {
+                        $currentRow = DB::table('order_items')
+                            ->where('order_id', $order->id)
+                            ->where('watch_id', $watchId)
+                            ->first();
+                        $oldQuantity = $currentRow->quantity ?? 0;
+                        $delta = $quantity - $oldQuantity;
+
+                        if ($delta > 0) {
+                            $this->stock->decreaseStock('watch', (int) $watchId, $delta);
+                        } elseif ($delta < 0) {
+                            $this->stock->increaseStockPlain('watch', (int) $watchId, -$delta);
+                        }
+
+                        DB::table('order_items')
+                            ->where('order_id', $order->id)
+                            ->where('watch_id', $watchId)
+                            ->update([
+                                'quantity' => $quantity,
+                                'updated_at' => now(),
+                            ]);
+
+                        $price = $watch->sale ?? $watch->price;
+                        $totalPrice += $price * $quantity;
+                    }
+                }
             }
-        }
-
-        // 🟣 Watch items
-        elseif (str_starts_with($key, 'item_watch_')) {
-            $watchId = str_replace('item_watch_', '', $key);
-            $quantity = (int) $request->input('quantity_watch_' . $watchId);
-
-            $watch = \App\Models\Watch::find($watchId);
-            if ($watch && $quantity >= 0) {
-                DB::table('order_items')
-                    ->where('order_id', $order->id)
-                    ->where('watch_id', $watchId)
-                    ->update([
-                        'quantity' => $quantity,
-                        'updated_at' => now(),
-                    ]);
-
-                $price = $watch->sale ?? $watch->price;
-                $totalPrice += $price * $quantity;
-            }
-        }
+        });
+    } catch (ValidationException $e) {
+        $message = collect($e->errors())->flatten()->first() ?? 'Could not update this order.';
+        return redirect('/order/edit/' . $order->id)->with('error', $message);
     }
 
     // ✅ Update total price

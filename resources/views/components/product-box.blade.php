@@ -52,10 +52,17 @@
                 <span class="price">${{ number_format($price, 2) }}</span>
                 @endif
             </div>
+            @if(!is_null($stock) && $stock <= 0)
+            <div class="quantity">Out of stock</div>
+            @else
             <div class="quantity">Quantity: <div class="quantity-btns"><button
                         onclick="updateQuantity('-')">-</button><input id="quantity-{{$id}}" class="quantity-input"
-                        name="quantity" value="1" min="1"><button onclick="updateQuantity('+')">+</button></div>
+                        name="quantity" value="1" min="1" @if(!is_null($stock)) max="{{$stock}}" @endif><button
+                        onclick="updateQuantity('+')">+</button></div>
             </div>
+            @if(!is_null($stock))
+            <p class="stock-note">{{ $stock }} in stock</p>
+            @endif
             <div class="order-btns">
                 <button class="add-cart" onclick="addToCart({{$id}},'{{ $pageType }}')">Add to cart</button>
                 <form id="buyNowForm" action="/addCart/true" method="POST">
@@ -65,6 +72,7 @@
                     <button type="submit" class="buy-now" onclick="syncQuantity()">Buy Now</button>
                 </form>
             </div>
+            @endif
         </div>
     </div>
 </div>

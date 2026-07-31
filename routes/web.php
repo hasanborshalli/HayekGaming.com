@@ -7,6 +7,9 @@ use App\Http\Controllers\ComingController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PunchOrderController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\WatchesController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Watch;
@@ -80,6 +83,24 @@ Route::get('/order/{order}', [PagesController::class,'OrderPage'])->middleware('
 Route::get('/finishOrder/{order}', [OrderController::class,'FinishOrder'])->middleware('auth');
 Route::get('/order/edit/{order}', [PagesController::class,'EditOrderPage'])->middleware('auth');
 Route::post('/order/edit/{order}', [OrderController::class,'EditOrder'])->middleware('auth');
+
+Route::get('/admin/stock', [PagesController::class,'stockPage'])->middleware('auth');
+Route::post('/admin/stock/adjust-bulk', [StockController::class,'adjustBulk'])->middleware('auth');
+Route::get('/admin/stock/search-items', [StockController::class,'searchItems'])->middleware('auth');
+
+Route::get('/admin/stock/purchases', [PagesController::class,'purchasesPage'])->middleware('auth');
+Route::get('/admin/stock/purchases/add', [PagesController::class,'addPurchasePage'])->middleware('auth');
+Route::post('/admin/stock/purchases/add', [PurchaseController::class,'store'])->middleware('auth');
+Route::get('/admin/stock/purchases/edit/{purchase}', [PagesController::class,'editPurchasePage'])->middleware('auth');
+Route::post('/admin/stock/purchases/edit/{purchase}', [PurchaseController::class,'update'])->middleware('auth');
+Route::get('/admin/stock/purchases/delete/{purchase}', [PurchaseController::class,'destroy'])->middleware('auth');
+
+Route::get('/admin/stock/punch-orders', [PagesController::class,'punchOrdersPage'])->middleware('auth');
+Route::get('/admin/stock/punch-orders/add', [PagesController::class,'addPunchOrderPage'])->middleware('auth');
+Route::post('/admin/stock/punch-orders/add', [PunchOrderController::class,'store'])->middleware('auth');
+Route::get('/admin/stock/punch-orders/edit/{punchOrder}', [PagesController::class,'editPunchOrderPage'])->middleware('auth');
+Route::post('/admin/stock/punch-orders/edit/{punchOrder}', [PunchOrderController::class,'update'])->middleware('auth');
+Route::get('/admin/stock/punch-orders/delete/{punchOrder}', [PunchOrderController::class,'destroy'])->middleware('auth');
 
 Route::get('/get-subcategories/{category}', [ProductController::class,'getSubCategories'])->middleware('auth');
 

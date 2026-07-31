@@ -25,6 +25,8 @@ function addToCart(id, type) {
                     showToast("Added to cart");
                 } else if (data.status === "addedOld") {
                     showToast("Added to cart");
+                } else if (data.status === "insufficientStock") {
+                    showToast(data.message || "Not enough stock available");
                 } else {
                     showToast("Error adding to cart");
                 }

@@ -67,7 +67,7 @@
         <x-product-box :pageType="$pageType" name="{{$product->name}}" price="{{$product->price}}" id="{{$product->id}}"
             image="{{$product->image}}" image1="{{$product->image1}}" image2="{{$product->image2}}"
             image3="{{$product->image3}}" image4="{{$product->image4}}" image5="{{$product->image5}}"
-            image6="{{$product->image6}}" sale="{{ $product->sale }}" />
+            image6="{{$product->image6}}" sale="{{ $product->sale }}" :stock="$product->stock_quantity" />
         @if ($hasGameTypes)
         <div class="product-overView">
             <h1>OverView</h1>

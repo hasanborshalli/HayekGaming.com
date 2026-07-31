@@ -99,13 +99,19 @@
                         <span class="qty-view">{{ $qty === null ? '—' : $qty }}</span>
                         <div class="qty-edit" style="display:none;">
                             <button type="button" class="qty-btn" onclick="stepQty(this,-1)">-</button>
-                            <input type="number" class="qty-input" min="0" value="{{ $qty ?? 0 }}" data-type="product" data-id="{{ $product->id }}">
+                            <input type="number" class="qty-input" min="0" placeholder="—"
+                                value="{{ $qty === null ? '' : $qty }}"
+                                data-original="{{ $qty === null ? '' : $qty }}"
+                                data-type="product" data-id="{{ $product->id }}">
                             <button type="button" class="qty-btn" onclick="stepQty(this,1)">+</button>
                         </div>
                     </td>
                     <td data-label="Threshold">
                         <span class="threshold-view">{{ $product->stock_threshold }}</span>
-                        <input type="number" class="threshold-input" min="0" style="display:none;" value="{{ $product->stock_threshold }}" data-type="product" data-id="{{ $product->id }}">
+                        <input type="number" class="threshold-input" min="0" style="display:none;"
+                            value="{{ $product->stock_threshold }}"
+                            data-original="{{ $product->stock_threshold }}"
+                            data-type="product" data-id="{{ $product->id }}">
                     </td>
                     <td data-label="Avg Cost">{{ $product->avg_cost !== null ? '$' . number_format($product->avg_cost, 2) : '—' }}</td>
                     <td data-label="Status"><span class="badge badge-{{ $status }}">{{ $label }}</span></td>
@@ -145,13 +151,19 @@
                         <span class="qty-view">{{ $qty === null ? '—' : $qty }}</span>
                         <div class="qty-edit" style="display:none;">
                             <button type="button" class="qty-btn" onclick="stepQty(this,-1)">-</button>
-                            <input type="number" class="qty-input" min="0" value="{{ $qty ?? 0 }}" data-type="watch" data-id="{{ $watch->id }}">
+                            <input type="number" class="qty-input" min="0" placeholder="—"
+                                value="{{ $qty === null ? '' : $qty }}"
+                                data-original="{{ $qty === null ? '' : $qty }}"
+                                data-type="watch" data-id="{{ $watch->id }}">
                             <button type="button" class="qty-btn" onclick="stepQty(this,1)">+</button>
                         </div>
                     </td>
                     <td data-label="Threshold">
                         <span class="threshold-view">{{ $watch->stock_threshold }}</span>
-                        <input type="number" class="threshold-input" min="0" style="display:none;" value="{{ $watch->stock_threshold }}" data-type="watch" data-id="{{ $watch->id }}">
+                        <input type="number" class="threshold-input" min="0" style="display:none;"
+                            value="{{ $watch->stock_threshold }}"
+                            data-original="{{ $watch->stock_threshold }}"
+                            data-type="watch" data-id="{{ $watch->id }}">
                     </td>
                     <td data-label="Avg Cost">{{ $watch->avg_cost !== null ? '$' . number_format($watch->avg_cost, 2) : '—' }}</td>
                     <td data-label="Status"><span class="badge badge-{{ $status }}">{{ $label }}</span></td>
@@ -191,9 +203,19 @@
         function saveStockChanges() {
             const items = [];
             document.querySelectorAll('.qty-input').forEach(input => {
+                // Still-untracked and untouched: never submit it (this used to be the bug —
+                // it silently zeroed out every untouched, previously-untracked row on the page).
+                if (input.value === '') return;
+
                 const type = input.dataset.type;
                 const id = input.dataset.id;
                 const thresholdInput = document.querySelector('.threshold-input[data-type="' + type + '"][data-id="' + id + '"]');
+
+                const qtyChanged = input.value !== input.dataset.original;
+                const thresholdChanged = thresholdInput && thresholdInput.value !== thresholdInput.dataset.original;
+
+                if (!qtyChanged && !thresholdChanged) return;
+
                 items.push({
                     type: type,
                     id: id,
@@ -202,7 +224,10 @@
                 });
             });
 
-            if (!items.length) return;
+            if (!items.length) {
+                alert('No changes to save.');
+                return;
+            }
 
             const saveBtn = document.getElementById('saveQtyBtn');
             saveBtn.disabled = true;

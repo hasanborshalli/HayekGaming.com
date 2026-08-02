@@ -37,7 +37,7 @@
         <div class="top-bar">
             <div class="qty-edit-controls">
                 <button type="button" id="adjustQtyBtn" class="adjust-qty-btn" onclick="toggleStockEdit()">Adjust Quantity</button>
-                <button type="button" id="saveQtyBtn" class="submit-btn" style="display:none;" onclick="saveStockChanges()">Save Changes</button>
+                <button type="button" id="saveQtyBtn" class="submit-btn" style="display:none;" onclick="saveStockChanges(null, this)">Save Changes</button>
                 <button type="button" id="cancelQtyBtn" class="clear-filter-link" style="display:none;" onclick="cancelStockEdit()">Cancel</button>
             </div>
         </div>
@@ -57,7 +57,7 @@
             </div>
             <div class="filter-group">
                 <label for="per_page">Per page</label>
-                <select name="per_page" id="per_page" onchange="this.form.submit()">
+                <select name="per_page" id="per_page" onchange="this.form.requestSubmit()">
                     <option value="15" {{ $perPage === 15 ? 'selected' : '' }}>15</option>
                     <option value="50" {{ $perPage === 50 ? 'selected' : '' }}>50</option>
                     <option value="100" {{ $perPage === 100 ? 'selected' : '' }}>100</option>
@@ -73,6 +73,7 @@
         </form>
 
         <h2 class="section-heading">Products</h2>
+        <div class="pagination-wrap" data-role="pagination">{{ $products->links() }}</div>
         <div class="table-scroll">
         <table class="stock-table">
             <thead>
@@ -122,9 +123,9 @@
             </tbody>
         </table>
         </div>
-        {{ $products->links() }}
 
         <h2 class="section-heading">Watches & Bracelets</h2>
+        <div class="pagination-wrap" data-role="pagination">{{ $watches->links() }}</div>
         <div class="table-scroll">
         <table class="stock-table">
             <thead>
@@ -174,11 +175,22 @@
             </tbody>
         </table>
         </div>
-        {{ $watches->links() }}
     </section>
+
+    <div id="unsavedChangesOverlay" class="overlay" style="display: none;">
+        <div class="confirm-box">
+            <p>You have unsaved quantity/threshold changes. What would you like to do before continuing?</p>
+            <div class="buttons">
+                <button class="btn" id="saveAndContinueBtn" style="background-color:#2a2670;">Save & Continue</button>
+                <button class="btn red" id="discardAndContinueBtn">Discard & Continue</button>
+                <button class="btn" id="cancelNavBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let stockEditMode = false;
+        let pendingNavUrl = null;
 
         function toggleStockEdit() {
             stockEditMode = true;
@@ -191,6 +203,7 @@
         }
 
         function cancelStockEdit() {
+            stockEditMode = false;
             window.location.reload();
         }
 
@@ -200,11 +213,12 @@
             input.value = next;
         }
 
-        function saveStockChanges() {
+        // Collects only the rows the admin actually touched — a still-untracked,
+        // untouched row must never be submitted (that was the bug that zeroed out
+        // every untracked item on the page when saving just one change).
+        function collectChangedItems() {
             const items = [];
             document.querySelectorAll('.qty-input').forEach(input => {
-                // Still-untracked and untouched: never submit it (this used to be the bug —
-                // it silently zeroed out every untouched, previously-untracked row on the page).
                 if (input.value === '') return;
 
                 const type = input.dataset.type;
@@ -223,13 +237,23 @@
                     threshold: thresholdInput ? thresholdInput.value : null,
                 });
             });
+            return items;
+        }
+
+        function saveStockChanges(redirectUrl, triggerButton) {
+            const items = collectChangedItems();
 
             if (!items.length) {
-                alert('No changes to save.');
+                if (redirectUrl) {
+                    stockEditMode = false;
+                    window.location.href = redirectUrl;
+                } else {
+                    alert('No changes to save.');
+                }
                 return;
             }
 
-            const saveBtn = document.getElementById('saveQtyBtn');
+            const saveBtn = triggerButton || document.getElementById('saveQtyBtn');
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
 
@@ -244,19 +268,76 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'saved') {
-                        window.location.reload();
+                        stockEditMode = false;
+                        window.location.href = redirectUrl || window.location.href;
                     } else {
                         alert(data.message || 'Failed to save changes.');
                         saveBtn.disabled = false;
-                        saveBtn.textContent = 'Save Changes';
+                        saveBtn.textContent = redirectUrl ? 'Save & Continue' : 'Save Changes';
                     }
                 })
                 .catch(() => {
                     alert('An error occurred while saving.');
                     saveBtn.disabled = false;
-                    saveBtn.textContent = 'Save Changes';
+                    saveBtn.textContent = redirectUrl ? 'Save & Continue' : 'Save Changes';
                 });
         }
+
+        function openUnsavedChangesPrompt(url) {
+            pendingNavUrl = url;
+            document.getElementById('unsavedChangesOverlay').style.display = 'flex';
+        }
+
+        function closeUnsavedChangesPrompt() {
+            pendingNavUrl = null;
+            document.getElementById('unsavedChangesOverlay').style.display = 'none';
+        }
+
+        document.getElementById('cancelNavBtn').addEventListener('click', closeUnsavedChangesPrompt);
+
+        document.getElementById('discardAndContinueBtn').addEventListener('click', function () {
+            const url = pendingNavUrl;
+            stockEditMode = false;
+            closeUnsavedChangesPrompt();
+            if (url) window.location.href = url;
+        });
+
+        document.getElementById('saveAndContinueBtn').addEventListener('click', function () {
+            const url = pendingNavUrl;
+            const btn = this;
+            document.getElementById('unsavedChangesOverlay').style.display = 'none';
+            saveStockChanges(url, btn);
+        });
+
+        // Intercept pagination links and the "Clear" filter link while editing, so a
+        // next/previous/clear click can't silently discard unsaved edits.
+        document.addEventListener('click', function (e) {
+            if (!stockEditMode) return;
+            const link = e.target.closest('[data-role="pagination"] a, .clear-filter-link');
+            if (!link) return;
+            e.preventDefault();
+            if (collectChangedItems().length) {
+                openUnsavedChangesPrompt(link.href);
+            } else {
+                window.location.href = link.href;
+            }
+        });
+
+        document.querySelector('.filter-bar').addEventListener('submit', function (e) {
+            if (!stockEditMode) return;
+            if (collectChangedItems().length) {
+                e.preventDefault();
+                openUnsavedChangesPrompt(this.action + '?' + new URLSearchParams(new FormData(this)).toString());
+            }
+        });
+
+        // Last-resort safety net for anything else that navigates away (sidebar links,
+        // closing the tab, typing a new URL) — browsers only show their own generic text here.
+        window.addEventListener('beforeunload', function (e) {
+            if (!stockEditMode || !collectChangedItems().length) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
     </script>
 </body>
 

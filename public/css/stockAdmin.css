@@ -208,6 +208,15 @@
     color: #2a2670;
 }
 
+.pagination-wrap {
+    margin-bottom: 10px;
+}
+
+.pagination-wrap nav[role="navigation"] {
+    margin-top: 0;
+    justify-content: flex-start;
+}
+
 /* Action buttons (purchases/punch-order lists) */
 .edit-btn, .delete-btn,
 .line-remove {

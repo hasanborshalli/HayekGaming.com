@@ -217,6 +217,12 @@
     justify-content: flex-start;
 }
 
+.pagination-info {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #7f8c8d;
+}
+
 /* Action buttons (purchases/punch-order lists) */
 .edit-btn, .delete-btn,
 .line-remove {

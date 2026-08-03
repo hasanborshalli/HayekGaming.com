@@ -73,7 +73,10 @@
         </form>
 
         <h2 class="section-heading">Products</h2>
-        <div class="pagination-wrap" data-role="pagination">{{ $products->links() }}</div>
+        <div class="pagination-wrap" data-role="pagination">
+            {{ $products->links() }}
+            <div class="pagination-info">Page {{ $products->currentPage() }} of {{ max($products->lastPage(), 1) }} ({{ $products->total() }} products)</div>
+        </div>
         <div class="table-scroll">
         <table class="stock-table">
             <thead>
@@ -125,7 +128,10 @@
         </div>
 
         <h2 class="section-heading">Watches & Bracelets</h2>
-        <div class="pagination-wrap" data-role="pagination">{{ $watches->links() }}</div>
+        <div class="pagination-wrap" data-role="pagination">
+            {{ $watches->links() }}
+            <div class="pagination-info">Page {{ $watches->currentPage() }} of {{ max($watches->lastPage(), 1) }} ({{ $watches->total() }} watches)</div>
+        </div>
         <div class="table-scroll">
         <table class="stock-table">
             <thead>
